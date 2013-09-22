@@ -25,7 +25,7 @@ async void Main()
 	}
 }
 
-Task TakeoffAndHover(DroneClient client) {
+Task<bool> TakeoffAndHover(DroneClient client) {
 	var tcs = new TaskCompletionSource<bool>();
 	Action<NavigationData> handler = null;
 	handler = (data) => { 
@@ -37,12 +37,14 @@ Task TakeoffAndHover(DroneClient client) {
 			tcs.SetResult(false);
 		}
 	};
-	
-	client.Takeoff();
+
+	// Times out the task if drone does not reach sufficient height
     var ct = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 	ct.Token.Register(() => {
 		client.NavigationDataAcquired -= handler;
 		tcs.SetResult(false);
 	});
+	client.NavigationDataAcquired += handler;
+	client.Takeoff();
 	return tcs.Task;
 }
