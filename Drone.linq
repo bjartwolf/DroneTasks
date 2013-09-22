@@ -39,8 +39,7 @@ Task TakeoffAndHover(DroneClient client) {
 	};
 	
 	client.Takeoff();
-	var timeout = TimeSpan.FromSeconds(5);
-    var ct = new CancellationTokenSource(timeout);
+    var ct = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 	ct.Token.Register(() => {
 		client.NavigationDataAcquired -= handler;
 		tcs.SetResult(false);
