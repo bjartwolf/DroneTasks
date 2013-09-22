@@ -4,10 +4,12 @@
   <Reference Relative="..\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Infrastructure.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Infrastructure.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\System.Threading.Tasks.dll</Reference>
   <NuGetReference>Rx-Main</NuGetReference>
+  <NuGetReference>Rx-Testing</NuGetReference>
   <Namespace>AR.Drone.Client</Namespace>
   <Namespace>AR.Drone.Client.Navigation</Namespace>
   <Namespace>AR.Drone.Data</Namespace>
   <Namespace>AR.Drone.Data.Navigation</Namespace>
+  <Namespace>Microsoft.Reactive.Testing</Namespace>
   <Namespace>System</Namespace>
   <Namespace>System.Reactive</Namespace>
   <Namespace>System.Reactive.Concurrency</Namespace>
@@ -20,10 +22,21 @@
 async void Main()
 {
 	var client = new DroneClient();
+	var scheduler = new TestScheduler();
 	Console.WriteLine("9. 8. 7. 6. 5. 4. 3. 2. 1. 0."); // This could have been a cool Rx thingy
 	Console.WriteLine("Take off!");
-	var takeoffComplete = client.TakeoffAndHover(TimeSpan.FromSeconds(10));
+	var takeoffComplete = client.TakeoffAndHover(TimeSpan.FromSeconds(3), scheduler);
 	Console.WriteLine("We have started the takeoff sequence");
+	Console.WriteLine("We passed a second");
+	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
+	Console.WriteLine("We passed a second more");
+	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
+	Console.WriteLine("We passed a second more");
+	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
+	Console.WriteLine("We passed a second more");
+	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
+
+	
 	if (await takeoffComplete) {
 		Console.WriteLine("It worked. We should land");
 		client.Land();
@@ -34,14 +47,13 @@ async void Main()
 	
 }
 
-//        public Task<bool> TakeoffAndHover(TimeSpan timeout)
+//        public Task<bool> TakeoffAndHover(TimeSpan timeout, IScheduler scheduler)
 //        {
 //            var tcs = new TaskCompletionSource<bool>();
 //            IObservable<EventPattern<NavigationData>> navdataStream = Observable.FromEventPattern<NavigationData>(this, "NavigationDataAcquiredProper");
 //            var hovering = navdataStream.Where((navdata) => navdata.EventArgs.State == NavigationState.Hovering);
 //            var emergency = navdataStream.Where((navdata) => navdata.EventArgs.State == NavigationState.Emergency);
-//            var amb = Observable.Amb(hovering, emergency);
-//            Observable.Timeout(amb,timeout);
+//            var amb = Observable.Amb(hovering, emergency).Timeout(timeout, scheduler);
 //            amb.Take(1).Subscribe((navdata) => {
 //                if (navdata.EventArgs.State == NavigationState.Hovering)
 //                {
@@ -51,12 +63,11 @@ async void Main()
 //                {
 //                    tcs.SetResult(false);
 //                }
-//            }, () => tcs.SetResult(false)); // Timeout
+//            }, (ex) => tcs.SetResult(false)); 
 //            this.Takeoff();
 //            return tcs.Task;
 //        }
-//
-//
+
 
 // 		Had to add the proper event, since the drone api uses actions
 //        public event EventHandler<NavigationData> NavigationDataAcquiredProper;
