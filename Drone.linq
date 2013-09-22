@@ -17,12 +17,10 @@ async void Main()
 	Console.WriteLine("Take off!");
 	var takeoffComplete = TakeoffAndHover(client);
 	Console.WriteLine("We have started the takeoff sequence");
-	try {
-		await takeoffComplete;
+	if (await takeoffComplete) {
 		Console.WriteLine("It worked. We should land");
 		client.Land();
-	} 
-	catch (TakeoffException ex) {
+	} else {
 		Console.WriteLine("I suppose we might have crashed and burned.");
 	}
 }
@@ -36,7 +34,7 @@ Task TakeoffAndHover(DroneClient client) {
 			client.NavigationDataAcquired -= handler;
 		} else if (data.State == NavigationState.Emergency) {
 			client.NavigationDataAcquired -= handler;
-			tcs.SetException(new TakeoffException());
+			tcs.SetResult(false);
 		}
 	};
 	
@@ -45,14 +43,7 @@ Task TakeoffAndHover(DroneClient client) {
     var ct = new CancellationTokenSource(timeout);
 	ct.Token.Register(() => {
 		client.NavigationDataAcquired -= handler;
-		tcs.TrySetException(new TakeoffException());
+		tcs.SetResult(false);
 	});
 	return tcs.Task;
-}
-
-public class TakeoffException : System.Exception
-{
-    public TakeoffException() : base()
-    {
-    }
 }
