@@ -25,8 +25,6 @@ async void Main()
 	catch (TakeoffException ex) {
 		Console.WriteLine("I suppose we might have crashed and burned.");
 	}
-	// Something like
-	// try { await client.takeoff(); Console.Writeline("flying"; } catch (TakeoffException ex) {Console.WriteLine(crash"};...
 }
 
 Task TakeoffAndHover(DroneClient client) {
@@ -37,10 +35,10 @@ Task TakeoffAndHover(DroneClient client) {
 			tcs.SetResult(true);
 			client.NavigationDataAcquired -= handler;
 		} else if (data.State == NavigationState.Emergency) {
+			client.NavigationDataAcquired -= handler;
 			tcs.SetException(new TakeoffException());
 		}
 	};
-	
 	
 	client.Takeoff();
 	var timeout = TimeSpan.FromSeconds(5);
@@ -49,7 +47,6 @@ Task TakeoffAndHover(DroneClient client) {
 		client.NavigationDataAcquired -= handler;
 		tcs.TrySetException(new TakeoffException());
 	});
-	
 	return tcs.Task;
 }
 
