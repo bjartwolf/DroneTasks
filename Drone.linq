@@ -35,36 +35,37 @@ async void Main()
 	
 }
 
-//
 //        public Task<bool> TakeoffAndHover(TimeSpan timeout)
 //        {
 //            var tcs = new TaskCompletionSource<bool>();
-//            Action<NavigationData> handler = null;
-//            handler = (data) =>
-//            {
-//                if (data.State == NavigationState.Hovering)
+//            IObservable<EventPattern<NavigationData>> navdataStream = Observable.FromEventPattern<NavigationData>(this, "NavigationDataAcquiredProper");
+//            var hovering = navdataStream.Where((navdata) => navdata.EventArgs.State == NavigationState.Hovering);
+//            var emergency = navdataStream.Where((navdata) => navdata.EventArgs.State == NavigationState.Emergency);
+//            var amb = Observable.Amb(hovering, emergency);
+//            Observable.Timeout(amb,timeout);
+//            amb.Take(1).Subscribe((navdata) => {
+//                if (navdata.EventArgs.State == NavigationState.Hovering)
 //                {
-//                    this.NavigationDataAcquired -= handler;
 //                    tcs.SetResult(true);
 //                }
-//                else if (data.State == NavigationState.Emergency)
+//                else
 //                {
-//                    this.NavigationDataAcquired -= handler;
 //                    tcs.SetResult(false);
 //                }
-//            };
-//
-//            // Times out the task if drone does not reach hovering state only works in 4.5, not 4.
-//            var ct = new CancellationTokenSource(timeout);
-//            ct.Token.Register(() =>
-//            {
-//                this.NavigationDataAcquired -= handler;
-//                tcs.SetResult(false);
-//            });
-//
-//            this.NavigationDataAcquired += handler;
+//            }, () => tcs.SetResult(false)); // Timeout
 //            this.Takeoff();
 //            return tcs.Task;
 //        }
 //
+//
+
+// 		Had to add the proper event, since the drone api uses actions
+//        public event EventHandler<NavigationData> NavigationDataAcquiredProper;
+//		private void OnNavigationDataAcquired(NavigationData navigationData)
+//        {
+//            if (NavigationDataAcquired != null) {
+//                NavigationDataAcquired(navigationData);
+//                NavigationDataAcquiredProper(this, navigationData);
+//                }
+//        }
 //
