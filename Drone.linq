@@ -30,8 +30,8 @@ Task<bool> TakeoffAndHover(DroneClient client) {
 	Action<NavigationData> handler = null;
 	handler = (data) => { 
 		if (data.State == NavigationState.Hovering) {
-			tcs.SetResult(true);
 			client.NavigationDataAcquired -= handler;
+			tcs.SetResult(true);
 		} else if (data.State == NavigationState.Emergency) {
 			client.NavigationDataAcquired -= handler;
 			tcs.SetResult(false);
@@ -42,8 +42,10 @@ Task<bool> TakeoffAndHover(DroneClient client) {
     var ct = new CancellationTokenSource(TimeSpan.FromSeconds(5));
 	ct.Token.Register(() => {
 		client.NavigationDataAcquired -= handler;
+		client.Land(); // Attempt to land, might have trouble reaching correct height
 		tcs.SetResult(false);
 	});
+	
 	client.NavigationDataAcquired += handler;
 	client.Takeoff();
 	return tcs.Task;
