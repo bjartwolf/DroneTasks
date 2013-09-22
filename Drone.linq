@@ -1,7 +1,7 @@
 <Query Kind="Program">
-  <Reference Relative="..\..\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Client.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Client.dll</Reference>
-  <Reference Relative="..\..\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Data.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Data.dll</Reference>
-  <Reference Relative="..\..\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Infrastructure.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Infrastructure.dll</Reference>
+  <Reference Relative="..\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Client.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Client.dll</Reference>
+  <Reference Relative="..\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Data.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Data.dll</Reference>
+  <Reference Relative="..\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Infrastructure.dll">&lt;MyDocuments&gt;\GitHub\AR.Drone\AR.Drone.Client\bin\Release\AR.Drone.Infrastructure.dll</Reference>
   <Reference>&lt;RuntimeDirectory&gt;\System.Threading.Tasks.dll</Reference>
   <Namespace>AR.Drone.Client</Namespace>
   <Namespace>AR.Drone.Client.Navigation</Namespace>
@@ -17,17 +17,19 @@ async void Main()
 	Console.WriteLine("Take off!");
 	var takeoffComplete = TakeoffAndHover(client);
 	Console.WriteLine("We have started the takeoff sequence");
-	if (await takeoffComplete) { // Can also rewrite to very nice exceptions insted of aw
+	try {
+		await takeoffComplete;
 		Console.WriteLine("It worked. We should land");
 		client.Land();
-	} else {
+	} 
+	catch (TakeoffException ex) {
 		Console.WriteLine("I suppose we might have crashed and burned.");
 	}
 	// Something like
 	// try { await client.takeoff(); Console.Writeline("flying"; } catch (TakeoffException ex) {Console.WriteLine(crash"};...
 }
 
-Task<bool> TakeoffAndHover(DroneClient client) {
+Task TakeoffAndHover(DroneClient client) {
 	var tcs = new TaskCompletionSource<bool>();
 	Action<NavigationData> handler = null;
 	handler = (data) => { 
