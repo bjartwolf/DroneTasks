@@ -22,7 +22,7 @@ async void Main()
 	var client = new DroneClient();
 	Console.WriteLine("9. 8. 7. 6. 5. 4. 3. 2. 1. 0."); // This could have been a cool Rx thingy
 	Console.WriteLine("Take off!");
-	var takeoffComplete = client.TakeoffAndHover(TimeSpan.FromSeconds(10));
+	var takeoffComplete = client.TakeoffAndHover();
 	Console.WriteLine("We have started the takeoff sequence");
 	if (await takeoffComplete) {
 		Console.WriteLine("It worked. We should land");

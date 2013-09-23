@@ -23,20 +23,10 @@ async void Main()
 {
 	var client = new DroneClient();
 	var scheduler = new TestScheduler();
-	Console.WriteLine("9. 8. 7. 6. 5. 4. 3. 2. 1. 0."); // This could have been a cool Rx thingy
 	Console.WriteLine("Take off!");
-	var takeoffComplete = client.TakeoffAndHover(TimeSpan.FromSeconds(3), scheduler);
-	Console.WriteLine("We have started the takeoff sequence");
-	Console.WriteLine("We passed a second");
-	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
-	Console.WriteLine("We passed a second more");
-	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
-	Console.WriteLine("We passed a second more");
-	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
-	Console.WriteLine("We passed a second more");
-	scheduler.AdvanceBy(TimeSpan.FromSeconds(1).Ticks);
-
-	
+	var takeoffComplete = client.TakeoffAndHover(scheduler);
+	Console.WriteLine("We have started the takeoff sequence, jump 12 seconds");
+	scheduler.AdvanceBy(TimeSpan.FromSeconds(12).Ticks);
 	if (await takeoffComplete) {
 		Console.WriteLine("It worked. We should land");
 		client.Land();
@@ -44,7 +34,6 @@ async void Main()
 		Console.WriteLine("I suppose we might have crashed and burned.");
 		client.Land(); // Attempt landing anyway...	
 	}
-	
 }
 
 //        public Task<bool> TakeoffAndHover(TimeSpan timeout, IScheduler scheduler)
